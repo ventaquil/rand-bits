@@ -1,0 +1,20 @@
+[package]
+name = "rand-bits"
+version = "0.0.0"
+authors = ["Konrad Goławski <konrad@golawski.it>"]
+edition = "2021"
+rust-version = "1.61.0"
+description = "Random number generators with a fixed number of set bits (ones)."
+readme = ".cargo/README.md"
+repository = "https://github.com/ventaquil/rand-bits"
+license = "MIT"
+keywords = ["random", "rng"]
+categories = ["algorithms"]
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]
+
+[dependencies]
+phf = { version = "0.11.2", features = ["macros"] }
+rand = "0.8.5"
