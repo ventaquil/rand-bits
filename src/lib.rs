@@ -81,12 +81,7 @@ impl Distribution<u16> for Standard {
             let minbits = (bits - cnt).checked_sub((k * u8::BITS) as u8).unwrap_or_default();
             let maxbits = min(bits - cnt, u8::BITS as u8);
             let bits = rng.gen_range(minbits..=maxbits);
-            let values = MAPPING.get(&bits).expect("bits count out of range");
-            let index = {
-                let index: usize = rng.gen();
-                index % values.len()
-            };
-            value = (value << 8) | (values[index] as u16);
+            value = (value << u8::BITS) | (Distribution::<u8>::sample(self, rng, bits) as u16);
             cnt += bits;
         }
         value
@@ -101,16 +96,11 @@ impl Distribution<u32> for Standard {
         assert!((0..=(u32::BITS as u8)).contains(&bits), "bits count out of range");
         let mut value = 0;
         let mut cnt = 0;
-        for k in (0..(u32::BITS / u8::BITS)).rev() {
-            let minbits = (bits - cnt).checked_sub((k * u8::BITS) as u8).unwrap_or_default();
-            let maxbits = min(bits - cnt, u8::BITS as u8);
+        for k in (0..(u32::BITS / u16::BITS)).rev() {
+            let minbits = (bits - cnt).checked_sub((k * u16::BITS) as u8).unwrap_or_default();
+            let maxbits = min(bits - cnt, u16::BITS as u8);
             let bits = rng.gen_range(minbits..=maxbits);
-            let values = MAPPING.get(&bits).expect("bits count out of range");
-            let index = {
-                let index: usize = rng.gen();
-                index % values.len()
-            };
-            value = (value << 8) | (values[index] as u32);
+            value = (value << u16::BITS) | (Distribution::<u16>::sample(self, rng, bits) as u32);
             cnt += bits;
         }
         value
@@ -125,16 +115,11 @@ impl Distribution<u64> for Standard {
         assert!((0..=(u64::BITS as u8)).contains(&bits), "bits count out of range");
         let mut value = 0;
         let mut cnt = 0;
-        for k in (0..(u64::BITS / u8::BITS)).rev() {
-            let minbits = (bits - cnt).checked_sub((k * u8::BITS) as u8).unwrap_or_default();
-            let maxbits = min(bits - cnt, u8::BITS as u8);
+        for k in (0..(u64::BITS / u32::BITS)).rev() {
+            let minbits = (bits - cnt).checked_sub((k * u32::BITS) as u8).unwrap_or_default();
+            let maxbits = min(bits - cnt, u32::BITS as u8);
             let bits = rng.gen_range(minbits..=maxbits);
-            let values = MAPPING.get(&bits).expect("bits count out of range");
-            let index = {
-                let index: usize = rng.gen();
-                index % values.len()
-            };
-            value = (value << 8) | (values[index] as u64);
+            value = (value << u32::BITS) | (Distribution::<u32>::sample(self, rng, bits) as u64);
             cnt += bits;
         }
         value
