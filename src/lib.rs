@@ -63,10 +63,7 @@ impl Distribution<u8> for Standard {
             u8::BITS => u8::MAX,
             _ => {
                 let values = MAPPING.get(&bits).expect("bits count out of range");
-                let index = {
-                    let index: usize = rng.gen();
-                    index % values.len()
-                };
+                let index = rng.gen_range(0..values.len());
                 values[index]
             },
         }
