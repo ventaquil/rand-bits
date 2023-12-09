@@ -74,9 +74,7 @@ impl Distribution<u16> for Standard {
     where
         R: Rng + ?Sized,
     {
-        if !(0..=(u16::BITS as u8)).contains(&bits) {
-            panic!("bits count out of range");
-        }
+        assert!((0..=(u16::BITS as u8)).contains(&bits), "bits count out of range");
         let mut value = 0;
         let mut cnt = 0;
         for k in (0..(u16::BITS / u8::BITS)).rev() {
@@ -100,9 +98,7 @@ impl Distribution<u32> for Standard {
     where
         R: Rng + ?Sized,
     {
-        if !(0..=(u32::BITS as u8)).contains(&bits) {
-            panic!("bits count out of range");
-        }
+        assert!((0..=(u32::BITS as u8)).contains(&bits), "bits count out of range");
         let mut value = 0;
         let mut cnt = 0;
         for k in (0..(u32::BITS / u8::BITS)).rev() {
@@ -126,9 +122,7 @@ impl Distribution<u64> for Standard {
     where
         R: Rng + ?Sized,
     {
-        if !(0..=(u64::BITS as u8)).contains(&bits) {
-            panic!("bits count out of range");
-        }
+        assert!((0..=(u64::BITS as u8)).contains(&bits), "bits count out of range");
         let mut value = 0;
         let mut cnt = 0;
         for k in (0..(u64::BITS / u8::BITS)).rev() {
