@@ -61,10 +61,7 @@ impl Distribution<u8> for Standard {
         R: Rng + ?Sized,
     {
         let values = MAPPING.get(&bits).expect("bits count out of range");
-        let index = {
-            let index: usize = rng.gen();
-            index % values.len()
-        };
+        let index = rng.gen_range(0..values.len());
         values[index]
     }
 }
