@@ -75,15 +75,15 @@ impl Distribution<u16> for Standard {
         R: Rng + ?Sized,
     {
         assert!((0..=(u16::BITS as u8)).contains(&bits), "bits count out of range");
-        let mut value = 0;
-        let mut cnt = 0;
-        for k in (0..(u16::BITS / u8::BITS)).rev() {
-            let minbits = (bits - cnt).checked_sub((k * u8::BITS) as u8).unwrap_or_default();
-            let maxbits = min(bits - cnt, u8::BITS as u8);
-            let bits = rng.gen_range(minbits..=maxbits);
-            value = (value << u8::BITS) | (Distribution::<u8>::sample(self, rng, bits) as u16);
-            cnt += bits;
-        }
+        
+        let min_low_bits = bits.checked_sub(u8::BITS as u8).unwrap_or_default();
+        let max_low_bits = min(bits, u8::BITS as u8);
+        let low_bits = rng.gen_range(min_low_bits..=max_low_bits);
+        let high_bits = bits - low_bits;
+
+        let value = Distribution::<u8>::sample(self, rng, high_bits) as u16;
+        let value = value << u8::BITS;
+        let value = value | Distribution::<u8>::sample(self, rng, low_bits) as u16;
         value
     }
 }
@@ -94,15 +94,15 @@ impl Distribution<u32> for Standard {
         R: Rng + ?Sized,
     {
         assert!((0..=(u32::BITS as u8)).contains(&bits), "bits count out of range");
-        let mut value = 0;
-        let mut cnt = 0;
-        for k in (0..(u32::BITS / u16::BITS)).rev() {
-            let minbits = (bits - cnt).checked_sub((k * u16::BITS) as u8).unwrap_or_default();
-            let maxbits = min(bits - cnt, u16::BITS as u8);
-            let bits = rng.gen_range(minbits..=maxbits);
-            value = (value << u16::BITS) | (Distribution::<u16>::sample(self, rng, bits) as u32);
-            cnt += bits;
-        }
+        
+        let min_low_bits = bits.checked_sub(u16::BITS as u8).unwrap_or_default();
+        let max_low_bits = min(bits, u16::BITS as u8);
+        let low_bits = rng.gen_range(min_low_bits..=max_low_bits);
+        let high_bits = bits - low_bits;
+
+        let value = Distribution::<u16>::sample(self, rng, high_bits) as u32;
+        let value = value << u16::BITS;
+        let value = value | Distribution::<u16>::sample(self, rng, low_bits) as u32;
         value
     }
 }
@@ -113,15 +113,15 @@ impl Distribution<u64> for Standard {
         R: Rng + ?Sized,
     {
         assert!((0..=(u64::BITS as u8)).contains(&bits), "bits count out of range");
-        let mut value = 0;
-        let mut cnt = 0;
-        for k in (0..(u64::BITS / u32::BITS)).rev() {
-            let minbits = (bits - cnt).checked_sub((k * u32::BITS) as u8).unwrap_or_default();
-            let maxbits = min(bits - cnt, u32::BITS as u8);
-            let bits = rng.gen_range(minbits..=maxbits);
-            value = (value << u32::BITS) | (Distribution::<u32>::sample(self, rng, bits) as u64);
-            cnt += bits;
-        }
+        
+        let min_low_bits = bits.checked_sub(u32::BITS as u8).unwrap_or_default();
+        let max_low_bits = min(bits, u32::BITS as u8);
+        let low_bits = rng.gen_range(min_low_bits..=max_low_bits);
+        let high_bits = bits - low_bits;
+
+        let value = Distribution::<u32>::sample(self, rng, high_bits) as u64;
+        let value = value << u32::BITS;
+        let value = value | Distribution::<u32>::sample(self, rng, low_bits) as u64;
         value
     }
 }
