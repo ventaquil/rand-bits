@@ -58,7 +58,7 @@ pub trait Distribution<T> {
 impl Distribution<u8> for Standard {
     fn sample<R>(&self, rng: &mut R, bits: u8) -> u8
     where
-        R: rand::Rng + ?Sized,
+        R: Rng + ?Sized,
     {
         let values = MAPPING.get(&bits).expect("bits count out of range");
         let index = {
@@ -72,7 +72,7 @@ impl Distribution<u8> for Standard {
 impl Distribution<u16> for Standard {
     fn sample<R>(&self, rng: &mut R, bits: u8) -> u16
     where
-        R: rand::Rng + ?Sized,
+        R: Rng + ?Sized,
     {
         if !(0..=(u16::BITS as u8)).contains(&bits) {
             panic!("bits count out of range");
@@ -98,7 +98,7 @@ impl Distribution<u16> for Standard {
 impl Distribution<u32> for Standard {
     fn sample<R>(&self, rng: &mut R, bits: u8) -> u32
     where
-        R: rand::Rng + ?Sized,
+        R: Rng + ?Sized,
     {
         if !(0..=(u32::BITS as u8)).contains(&bits) {
             panic!("bits count out of range");
@@ -124,7 +124,7 @@ impl Distribution<u32> for Standard {
 impl Distribution<u64> for Standard {
     fn sample<R>(&self, rng: &mut R, bits: u8) -> u64
     where
-        R: rand::Rng + ?Sized,
+        R: Rng + ?Sized,
     {
         if !(0..=(u64::BITS as u8)).contains(&bits) {
             panic!("bits count out of range");
