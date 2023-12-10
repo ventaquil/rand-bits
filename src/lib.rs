@@ -152,19 +152,18 @@ impl Distribution<u128> for Standard {
         match bits {
             0 => u128::MIN,
             u128::BITS => u128::MAX,
-            bits => {
-                assert!((1..u128::BITS).contains(&bits), "bits count out of range");
-
-                let min_low_bits = bits.checked_sub(u64::BITS).unwrap_or_default();
-                let max_low_bits = min(bits, u64::BITS);
-                let low_bits = rng.gen_range(min_low_bits..=max_low_bits);
-                let high_bits = bits - low_bits;
+            bits if (1..u128::BITS).contains(&bits) => {
+                let min_high_bits = bits.checked_sub(u64::BITS).unwrap_or_default();
+                let max_high_bits = min(bits, u64::BITS);
+                let high_bits = rng.gen_range(min_high_bits..=max_high_bits);
+                let low_bits = bits - high_bits;
 
                 let value = Distribution::<u64>::sample(self, rng, high_bits) as u128;
                 let value = value << u64::BITS;
                 let value = value | Distribution::<u64>::sample(self, rng, low_bits) as u128;
                 value
             },
+            _ => panic!("bits count out of range"),
         }
     }
 }
