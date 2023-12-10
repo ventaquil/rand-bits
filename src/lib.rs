@@ -71,23 +71,16 @@ impl Distribution<u16> for Standard {
     where
         R: Rng + ?Sized,
     {
-        if !(0..=u16::BITS).contains(&bits) {
-            panic!("bits count out of range");
-        }
-        let mut value = 0;
-        let mut cnt = 0;
-        for k in (0..(u16::BITS / u8::BITS)).rev() {
-            let minbits = (bits - cnt).checked_sub(k * u8::BITS).unwrap_or_default();
-            let maxbits = min(bits - cnt, u8::BITS);
-            let bits = rng.gen_range(minbits..=maxbits);
-            let values = MAPPING.get(&bits).expect("bits count out of range");
-            let index = {
-                let index: usize = rng.gen();
-                index % values.len()
-            };
-            value = (value << 8) | (values[index] as u16);
-            cnt += bits;
-        }
+        assert!((0..=u16::BITS).contains(&bits), "bits count out of range");
+
+        let min_high_bits = bits.checked_sub(u8::BITS).unwrap_or_default();
+        let max_high_bits = min(bits, u8::BITS);
+        let high_bits = rng.gen_range(min_high_bits..=max_high_bits);
+        let low_bits = bits - high_bits;
+
+        let value = Distribution::<u8>::sample(self, rng, high_bits) as u16;
+        let value = value << u8::BITS;
+        let value = value | Distribution::<u8>::sample(self, rng, low_bits) as u16;
         value
     }
 }
@@ -97,23 +90,16 @@ impl Distribution<u32> for Standard {
     where
         R: Rng + ?Sized,
     {
-        if !(0..=u32::BITS).contains(&bits) {
-            panic!("bits count out of range");
-        }
-        let mut value = 0;
-        let mut cnt = 0;
-        for k in (0..(u32::BITS / u8::BITS)).rev() {
-            let minbits = (bits - cnt).checked_sub(k * u8::BITS).unwrap_or_default();
-            let maxbits = min(bits - cnt, u8::BITS);
-            let bits = rng.gen_range(minbits..=maxbits);
-            let values = MAPPING.get(&bits).expect("bits count out of range");
-            let index = {
-                let index: usize = rng.gen();
-                index % values.len()
-            };
-            value = (value << 8) | (values[index] as u32);
-            cnt += bits;
-        }
+        assert!((0..=u32::BITS).contains(&bits), "bits count out of range");
+
+        let min_high_bits = bits.checked_sub(u16::BITS).unwrap_or_default();
+        let max_high_bits = min(bits, u16::BITS);
+        let high_bits = rng.gen_range(min_high_bits..=max_high_bits);
+        let low_bits = bits - high_bits;
+
+        let value = Distribution::<u16>::sample(self, rng, high_bits) as u32;
+        let value = value << u16::BITS;
+        let value = value | Distribution::<u16>::sample(self, rng, low_bits) as u32;
         value
     }
 }
@@ -123,23 +109,16 @@ impl Distribution<u64> for Standard {
     where
         R: Rng + ?Sized,
     {
-        if !(0..=u64::BITS).contains(&bits) {
-            panic!("bits count out of range");
-        }
-        let mut value = 0;
-        let mut cnt = 0;
-        for k in (0..(u64::BITS / u8::BITS)).rev() {
-            let minbits = (bits - cnt).checked_sub(k * u8::BITS).unwrap_or_default();
-            let maxbits = min(bits - cnt, u8::BITS);
-            let bits = rng.gen_range(minbits..=maxbits);
-            let values = MAPPING.get(&bits).expect("bits count out of range");
-            let index = {
-                let index: usize = rng.gen();
-                index % values.len()
-            };
-            value = (value << 8) | (values[index] as u64);
-            cnt += bits;
-        }
+        assert!((0..=u64::BITS).contains(&bits), "bits count out of range");
+
+        let min_high_bits = bits.checked_sub(u32::BITS).unwrap_or_default();
+        let max_high_bits = min(bits, u32::BITS);
+        let high_bits = rng.gen_range(min_high_bits..=max_high_bits);
+        let low_bits = bits - high_bits;
+
+        let value = Distribution::<u32>::sample(self, rng, high_bits) as u64;
+        let value = value << u32::BITS;
+        let value = value | Distribution::<u32>::sample(self, rng, low_bits) as u64;
         value
     }
 }
