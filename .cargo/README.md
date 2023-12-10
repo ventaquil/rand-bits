@@ -3,7 +3,7 @@
 [![GitHub](https://img.shields.io/badge/github-ventaquil%2Frand--bits-24292e?style=flat-square&logo=github "GitHub")](https://github.com/ventaquil/rand-bits)
 [![docs.rs](https://img.shields.io/docsrs/rand-bits?style=flat-square&logo=docsdotrs "docs.rs")](https://docs.rs/rand-bits)
 [![MSRV](https://img.shields.io/badge/MSRV-1.61.0-informational?style=flat-square "MSRV")](https://github.com/ventaquil/rand-bits/blob/master/Cargo.toml)
-[![deps.rs](https://deps.rs/crate/rand-bits/0.1.0/status.svg?style=flat-square "deps.rs")](https://deps.rs/crate/rand-bits/0.1.0)
+[![deps.rs](https://deps.rs/crate/rand-bits/0.1.1/status.svg?style=flat-square "deps.rs")](https://deps.rs/crate/rand-bits/0.1.1)
 [![unsafe forbidden](https://img.shields.io/badge/unsafe-forbidden-success.svg?style=flat-square "unsafe forbidden")](https://github.com/rust-secure-code/safety-dance)
 [![LICENSE](https://img.shields.io/github/license/ventaquil/rand-bits?style=flat-square "LICENSE")](https://github.com/ventaquil/rand-bits/blob/master/LICENSE)
 
@@ -15,7 +15,7 @@ To use this crate, add the following entry to your `Cargo.toml` file in the `dep
 
 ```toml
 [dependencies]
-rand-bits = "0.1.0"
+rand-bits = "0.1.1"
 ```
 
 Alternatively, you can use the [`cargo add`](https://doc.rust-lang.org/cargo/commands/cargo-add.html) subcommand:
