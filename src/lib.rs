@@ -144,6 +144,31 @@ impl Distribution<u64> for Standard {
     }
 }
 
+impl Distribution<u128> for Standard {
+    fn sample<R>(&self, rng: &mut R, bits: u32) -> u128
+    where
+        R: Rng + ?Sized,
+    {
+        match bits {
+            0 => u128::MIN,
+            u128::BITS => u128::MAX,
+            bits => {
+                assert!((1..u128::BITS).contains(&bits), "bits count out of range");
+
+                let min_low_bits = bits.checked_sub(u64::BITS).unwrap_or_default();
+                let max_low_bits = min(bits, u64::BITS);
+                let low_bits = rng.gen_range(min_low_bits..=max_low_bits);
+                let high_bits = bits - low_bits;
+
+                let value = Distribution::<u64>::sample(self, rng, high_bits) as u128;
+                let value = value << u64::BITS;
+                let value = value | Distribution::<u64>::sample(self, rng, low_bits) as u128;
+                value
+            },
+        }
+    }
+}
+
 /// An automatically-implemented extension trait on [`rand::Rng`].
 ///
 /// # Example:
@@ -221,6 +246,15 @@ mod tests {
         let mut rng = rand::thread_rng();
         for i in 0..=u64::BITS {
             let n: u64 = rng.gen_bits(i);
+            assert_eq!(n.count_ones(), i);
+        }
+    }
+
+    #[test]
+    fn u128() {
+        let mut rng = rand::thread_rng();
+        for i in 0..=u128::BITS {
+            let n: u128 = rng.gen_bits(i);
             assert_eq!(n.count_ones(), i);
         }
     }
