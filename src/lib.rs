@@ -27,7 +27,6 @@ use phf::{phf_map, Map};
 use rand::Rng;
 
 const MAPPING: Map<u32, &'static [u8]> = phf_map! {
-    0u32 => &[0x00],
     1u32 => &[0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80],
     2u32 => &[0x03, 0x05, 0x06, 0x09, 0x0A, 0x0C, 0x11, 0x12, 0x14, 0x18, 0x21, 0x22, 0x24, 0x28, 0x30, 0x41, 0x42, 0x44, 0x48, 0x50, 0x60, 0x81, 0x82, 0x84, 0x88, 0x90, 0xA0, 0xC0],
     3u32 => &[0x07, 0x0B, 0x0D, 0x0E, 0x13, 0x15, 0x16, 0x19, 0x1A, 0x1C, 0x23, 0x25, 0x26, 0x29, 0x2A, 0x2C, 0x31, 0x32, 0x34, 0x38, 0x43, 0x45, 0x46, 0x49, 0x4A, 0x4C, 0x51, 0x52, 0x54, 0x58, 0x61, 0x62, 0x64, 0x68, 0x70, 0x83, 0x85, 0x86, 0x89, 0x8A, 0x8C, 0x91, 0x92, 0x94, 0x98, 0xA1, 0xA2, 0xA4, 0xA8, 0xB0, 0xC1, 0xC2, 0xC4, 0xC8, 0xD0, 0xE0],
@@ -35,7 +34,6 @@ const MAPPING: Map<u32, &'static [u8]> = phf_map! {
     5u32 => &[0x1F, 0x2F, 0x37, 0x3B, 0x3D, 0x3E, 0x4F, 0x57, 0x5B, 0x5D, 0x5E, 0x67, 0x6B, 0x6D, 0x6E, 0x73, 0x75, 0x76, 0x79, 0x7A, 0x7C, 0x8F, 0x97, 0x9B, 0x9D, 0x9E, 0xA7, 0xAB, 0xAD, 0xAE, 0xB3, 0xB5, 0xB6, 0xB9, 0xBA, 0xBC, 0xC7, 0xCB, 0xCD, 0xCE, 0xD3, 0xD5, 0xD6, 0xD9, 0xDA, 0xDC, 0xE3, 0xE5, 0xE6, 0xE9, 0xEA, 0xEC, 0xF1, 0xF2, 0xF4, 0xF8],
     6u32 => &[0x3F, 0x5F, 0x6F, 0x77, 0x7B, 0x7D, 0x7E, 0x9F, 0xAF, 0xB7, 0xBB, 0xBD, 0xBE, 0xCF, 0xD7, 0xDB, 0xDD, 0xDE, 0xE7, 0xEB, 0xED, 0xEE, 0xF3, 0xF5, 0xF6, 0xF9, 0xFA, 0xFC],
     7u32 => &[0x7F, 0xBF, 0xDF, 0xEF, 0xF7, 0xFB, 0xFD, 0xFE],
-    8u32 => &[0xFF],
 };
 
 /// A generic random value distribution, implemented for many primitive types.
@@ -60,9 +58,15 @@ impl Distribution<u8> for Standard {
     where
         R: Rng + ?Sized,
     {
-        let values = MAPPING.get(&bits).expect("bits count out of range");
-        let index = rng.gen_range(0..values.len());
-        values[index]
+        match bits {
+            0 => u8::MIN,
+            u8::BITS => u8::MAX,
+            bits => {
+                let values = MAPPING.get(&bits).expect("bits count out of range");
+                let index = rng.gen_range(0..values.len());
+                values[index]
+            },
+        }
     }
 }
 
@@ -71,17 +75,22 @@ impl Distribution<u16> for Standard {
     where
         R: Rng + ?Sized,
     {
-        assert!((0..=u16::BITS).contains(&bits), "bits count out of range");
+        match bits {
+            0 => u16::MIN,
+            u16::BITS => u16::MAX,
+            bits if (1..u16::BITS).contains(&bits) => {
+                let min_high_bits = bits.checked_sub(u8::BITS).unwrap_or_default();
+                let max_high_bits = min(bits, u8::BITS);
+                let high_bits = rng.gen_range(min_high_bits..=max_high_bits);
+                let low_bits = bits - high_bits;
 
-        let min_high_bits = bits.checked_sub(u8::BITS).unwrap_or_default();
-        let max_high_bits = min(bits, u8::BITS);
-        let high_bits = rng.gen_range(min_high_bits..=max_high_bits);
-        let low_bits = bits - high_bits;
-
-        let value = Distribution::<u8>::sample(self, rng, high_bits) as u16;
-        let value = value << u8::BITS;
-        let value = value | Distribution::<u8>::sample(self, rng, low_bits) as u16;
-        value
+                let value = Distribution::<u8>::sample(self, rng, high_bits) as u16;
+                let value = value << u8::BITS;
+                let value = value | Distribution::<u8>::sample(self, rng, low_bits) as u16;
+                value
+            },
+            _ => panic!("bits count out of range"),
+        }
     }
 }
 
@@ -90,17 +99,22 @@ impl Distribution<u32> for Standard {
     where
         R: Rng + ?Sized,
     {
-        assert!((0..=u32::BITS).contains(&bits), "bits count out of range");
+        match bits {
+            0 => u32::MIN,
+            u32::BITS => u32::MAX,
+            bits if (1..u32::BITS).contains(&bits) => {
+                let min_high_bits = bits.checked_sub(u16::BITS).unwrap_or_default();
+                let max_high_bits = min(bits, u16::BITS);
+                let high_bits = rng.gen_range(min_high_bits..=max_high_bits);
+                let low_bits = bits - high_bits;
 
-        let min_high_bits = bits.checked_sub(u16::BITS).unwrap_or_default();
-        let max_high_bits = min(bits, u16::BITS);
-        let high_bits = rng.gen_range(min_high_bits..=max_high_bits);
-        let low_bits = bits - high_bits;
-
-        let value = Distribution::<u16>::sample(self, rng, high_bits) as u32;
-        let value = value << u16::BITS;
-        let value = value | Distribution::<u16>::sample(self, rng, low_bits) as u32;
-        value
+                let value = Distribution::<u16>::sample(self, rng, high_bits) as u32;
+                let value = value << u16::BITS;
+                let value = value | Distribution::<u16>::sample(self, rng, low_bits) as u32;
+                value
+            },
+            _ => panic!("bits count out of range"),
+        }
     }
 }
 
@@ -109,17 +123,22 @@ impl Distribution<u64> for Standard {
     where
         R: Rng + ?Sized,
     {
-        assert!((0..=u64::BITS).contains(&bits), "bits count out of range");
+        match bits {
+            0 => u64::MIN,
+            u64::BITS => u64::MAX,
+            bits if (1..u64::BITS).contains(&bits) => {
+                let min_high_bits = bits.checked_sub(u32::BITS).unwrap_or_default();
+                let max_high_bits = min(bits, u32::BITS);
+                let high_bits = rng.gen_range(min_high_bits..=max_high_bits);
+                let low_bits = bits - high_bits;
 
-        let min_high_bits = bits.checked_sub(u32::BITS).unwrap_or_default();
-        let max_high_bits = min(bits, u32::BITS);
-        let high_bits = rng.gen_range(min_high_bits..=max_high_bits);
-        let low_bits = bits - high_bits;
-
-        let value = Distribution::<u32>::sample(self, rng, high_bits) as u64;
-        let value = value << u32::BITS;
-        let value = value | Distribution::<u32>::sample(self, rng, low_bits) as u64;
-        value
+                let value = Distribution::<u32>::sample(self, rng, high_bits) as u64;
+                let value = value << u32::BITS;
+                let value = value | Distribution::<u32>::sample(self, rng, low_bits) as u64;
+                value
+            },
+            _ => panic!("bits count out of range"),
+        }
     }
 }
 

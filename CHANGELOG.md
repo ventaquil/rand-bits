@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Use `Rng::gen_range` to generate the mapping index.
 - Use `u32` for the `bits` argument.
 - Split each type into high/low parts.
+- Do not rand when the min/max value is wanted.
 
 ## [0.0.0] - 2023-12-08
 
