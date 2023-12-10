@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - Use `Rng::gen_range` to generate the mapping index.
+- Use `u32` for the `bits` argument.
 
 ## [0.0.0] - 2023-12-08
 
