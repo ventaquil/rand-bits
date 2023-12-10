@@ -86,9 +86,9 @@ impl Distribution<u16> for Standard {
                 let high_bits = rng.gen_range(min_high_bits..=max_high_bits);
                 let low_bits = bits - high_bits;
 
-                let value = Distribution::<u8>::sample(self, rng, high_bits) as u16;
-                let value = value << u8::BITS;
-                let value = value | Distribution::<u8>::sample(self, rng, low_bits) as u16;
+                let mut value = Distribution::<u8>::sample(self, rng, high_bits) as u16;
+                value <<= u8::BITS;
+                value |= Distribution::<u8>::sample(self, rng, low_bits) as u16;
                 value
             },
             _ => panic!("bits count out of range"),
@@ -110,9 +110,9 @@ impl Distribution<u32> for Standard {
                 let high_bits = rng.gen_range(min_high_bits..=max_high_bits);
                 let low_bits = bits - high_bits;
 
-                let value = Distribution::<u16>::sample(self, rng, high_bits) as u32;
-                let value = value << u16::BITS;
-                let value = value | Distribution::<u16>::sample(self, rng, low_bits) as u32;
+                let mut value = Distribution::<u16>::sample(self, rng, high_bits) as u32;
+                value <<= u16::BITS;
+                value |= Distribution::<u16>::sample(self, rng, low_bits) as u32;
                 value
             },
             _ => panic!("bits count out of range"),
@@ -134,9 +134,9 @@ impl Distribution<u64> for Standard {
                 let high_bits = rng.gen_range(min_high_bits..=max_high_bits);
                 let low_bits = bits - high_bits;
 
-                let value = Distribution::<u32>::sample(self, rng, high_bits) as u64;
-                let value = value << u32::BITS;
-                let value = value | Distribution::<u32>::sample(self, rng, low_bits) as u64;
+                let mut value = Distribution::<u32>::sample(self, rng, high_bits) as u64;
+                value <<= u32::BITS;
+                value |= Distribution::<u32>::sample(self, rng, low_bits) as u64;
                 value
             },
             _ => panic!("bits count out of range"),
@@ -158,9 +158,9 @@ impl Distribution<u128> for Standard {
                 let high_bits = rng.gen_range(min_high_bits..=max_high_bits);
                 let low_bits = bits - high_bits;
 
-                let value = Distribution::<u64>::sample(self, rng, high_bits) as u128;
-                let value = value << u64::BITS;
-                let value = value | Distribution::<u64>::sample(self, rng, low_bits) as u128;
+                let mut value = Distribution::<u64>::sample(self, rng, high_bits) as u128;
+                value <<= u64::BITS;
+                value |= Distribution::<u64>::sample(self, rng, low_bits) as u128;
                 value
             },
             _ => panic!("bits count out of range"),

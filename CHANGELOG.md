@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Change code convention for the `u128` type.
 
+### Changed
+
+- Use `let mut` instead of `let` to create the value.
+
 ## [0.1.0] - 2023-12-10
 
 ### Added
